@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Epic Event Rentals | Instant AI Booking</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
+        
+        :root {
+            --primary: #8b5cf6; /* Vibrant Purple */
+            --secondary: #f59e0b; /* Bright Yellow/Orange */
+            --dark: #1e1b4b;
+            --light: #f5f3ff;
+            --white: #ffffff;
+        }
+
+        body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; background: var(--light); color: var(--dark); overflow-x: hidden; }
+        
+        header { background: var(--white); padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 50; }
+        .logo { font-size: 24px; font-weight: 800; color: var(--dark); letter-spacing: -0.5px; }
+        .logo span { color: var(--primary); }
+        
+        .dev-btn { background: var(--light); color: var(--primary); border: 2px solid var(--primary); padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .dev-btn:hover { background: var(--primary); color: var(--white); }
+
+        .hero { background: linear-gradient(rgba(30, 27, 75, 0.8), rgba(30, 27, 75, 0.9)), url('https://images.unsplash.com/photo-1574259392081-dbe3c19cd15e?auto=format&fit=crop&q=80&w=1920') center/cover; color: var(--white); padding: 140px 20px; text-align: center; }
+        .hero h1 { font-size: 56px; font-weight: 800; margin: 0 0 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .hero p { font-size: 20px; max-width: 600px; margin: 0 auto; opacity: 0.9; }
+
+        .inventory-section { max-width: 1200px; margin: 80px auto; padding: 0 20px; }
+        .inventory-header { text-align: center; margin-bottom: 50px; }
+        .inventory-header h2 { font-size: 36px; color: var(--primary); margin-bottom: 10px; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .card { background: var(--white); border-radius: 20px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); transition: transform 0.3s; border: 2px solid transparent; }
+        .card:hover { transform: translateY(-10px); border-color: var(--secondary); }
+        .card-img { height: 220px; background-size: cover; background-position: center; }
+        .card-content { padding: 30px; }
+        .price-tag { display: inline-block; background: var(--secondary); color: var(--dark); font-weight: 800; padding: 5px 15px; border-radius: 20px; font-size: 14px; margin-bottom: 15px; }
+        .card h3 { margin: 0 0 10px; font-size: 22px; }
+        .card p { color: #6b7280; font-size: 15px; margin-bottom: 20px; }
+        .book-btn { width: 100%; background: var(--primary); color: var(--white); border: none; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 16px; cursor: pointer; transition: 0.2s; }
+        .book-btn:hover { background: #7c3aed; }
+
+        /* Chat Toggle Button */
+        .chat-toggle { position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px; border-radius: 50%; background: var(--secondary); color: var(--dark); border: none; font-size: 30px; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4); cursor: pointer; z-index: 100; transition: transform 0.3s; display: flex; align-items: center; justify-content: center; }
+        .chat-toggle:hover { transform: scale(1.1); }
+        .chat-toggle.hidden { transform: scale(0); opacity: 0; pointer-events: none; }
+
+        /* Floating Chat Widget */
+        .chat-container { position: fixed; bottom: 30px; right: 30px; width: 380px; background: var(--white); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); display: flex; flex-direction: column; overflow: hidden; border: 1px solid #e5e7eb; z-index: 101; transform: scale(0); transform-origin: bottom right; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s ease; opacity: 0; pointer-events: none; }
+        .chat-container.open { transform: scale(1); opacity: 1; pointer-events: auto; }
+        .chat-header { background: var(--primary); color: var(--white); padding: 20px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+        .close-chat-btn { background: none; border: none; color: var(--white); font-size: 24px; cursor: pointer; opacity: 0.8; }
+        .close-chat-btn:hover { opacity: 1; }
+        .chat-box { height: 400px; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; background: #faf5ff; }
+        .msg { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
+        .msg.bot { background: var(--white); align-self: flex-start; border-bottom-left-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #ede9fe; }
+        .msg.user { background: var(--primary); color: var(--white); align-self: flex-end; border-bottom-right-radius: 4px; }
+        .chat-input-area { padding: 15px; background: var(--white); border-top: 1px solid #ede9fe; display: flex; gap: 10px; }
+        input[type="text"] { flex: 1; padding: 12px; border: 1px solid #e5e7eb; border-radius: 12px; outline: none; font-family: 'Poppins', sans-serif; }
+        input[type="text"]:focus { border-color: var(--primary); }
+        .send-btn { background: var(--secondary); color: var(--dark); border: none; padding: 0 20px; border-radius: 12px; cursor: pointer; font-weight: 600; font-family: 'Poppins', sans-serif; }
+
+        /* Backend Panel */
+        .backend-panel { position: fixed; top: 0; left: -650px; width: 600px; height: 100vh; background: var(--white); z-index: 200; padding: 40px; box-sizing: border-box; overflow-y: auto; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 20px 0 50px rgba(0,0,0,0.2); }
+        .backend-panel.open { left: 0; }
+        .panel-close-btn { position: absolute; top: 30px; right: 30px; background: none; border: none; font-size: 28px; cursor: pointer; color: var(--dark); }
+        .iframe-container { margin-bottom: 30px; border-radius: 12px; overflow: hidden; height: 350px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; }
+        .iframe-container iframe { width: 100%; height: 100%; border: none; }
+        .panel-label { font-size: 12px; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 10px; display: block; letter-spacing: 1px; }
+        
+        .stripe-alert { background: #ecfdf5; border: 1px solid #10b981; color: #047857; padding: 15px; border-radius: 12px; display: none; font-size: 13px; font-weight: 600; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <!-- Backend Dev Panel -->
+    <div class="backend-panel" id="backendPanel">
+        <button class="panel-close-btn" onclick="toggleBackend()">×</button>
+        <h2 style="margin-top:0; color: var(--dark);">⚙️ Inventory Control Room</h2>
+        <p style="color: #6b7280; font-size: 14px; margin-bottom: 30px;">The AI reads this live Google Calendar to prevent double-bookings, then issues Stripe links automatically.</p>
+        
+        <div class="stripe-alert" id="stripeAlert">
+            💳 STRIPE CHECKOUT INITIATED: The AI just deployed a live payment link for the customer.
+        </div>
+
+        <span class="panel-label">Live Inventory Calendar</span>
+        <div class="iframe-container">
+            <iframe src="https://calendar.google.com/calendar/embed?src=sakuramisakikawaii%40gmail.com&ctz=Asia%2FManila&mode=WEEK"></iframe>
+        </div>
+
+        <span class="panel-label">Lead Database</span>
+        <div class="iframe-container">
+            <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ2No54tpOdLhI3xUyJf0few-si1qAvoKpib1KIuZM7AlQiJElqZCGtOXKL1PQQqC1vtlB3IyA4wdmW/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="logo">Epic <span>Events</span></div>
+        <button class="dev-btn" onclick="toggleBackend()">View Backend (Dev Mode)</button>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1>Turn Your Backyard Into A Bash.</h1>
+        <p>Chat with our AI to check live calendar availability and book your bounce house instantly.</p>
+    </section>
+
+    <!-- Inventory -->
+    <section class="inventory-section">
+        <div class="inventory-header">
+            <h2>Current Inventory</h2>
+            <p style="color: #6b7280;">Inventory syncs directly with our Google Calendar.</p>
+        </div>
+        <div class="grid">
+            <div class="card">
+                <div class="card-img" style="background-image: url('https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?auto=format&fit=crop&q=80&w=600');"></div>
+                <div class="card-content">
+                    <span class="price-tag">$150 / day</span>
+                    <h3>Classic Castle</h3>
+                    <p>Perfect for birthdays and block parties. Standard 15x15 footprint.</p>
+                    <button class="book-btn" onclick="openChatWithPrefill('I want to book the Classic Castle')">Check Availability &rarr;</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-img" style="background-image: url('https://images.unsplash.com/photo-1563823250269-826d15a5bb1d?auto=format&fit=crop&q=80&w=600');"></div>
+                <div class="card-content">
+                    <span class="price-tag">$250 / day</span>
+                    <h3>Tropical Slide</h3>
+                    <p>Beat the heat with this 18-foot inflatable water slide.</p>
+                    <button class="book-btn" onclick="openChatWithPrefill('I want to book the Tropical Slide')">Check Availability &rarr;</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chat Widget -->
+    <button class="chat-toggle" id="chatToggleBtn" onclick="toggleChat()">🎈</button>
+
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-header">
+            Epic Events AI Booking
+            <button class="close-chat-btn" onclick="toggleChat()">×</button>
+        </div>
+        <div class="chat-box" id="chat-box">
+            <div class="msg bot">Hi! Ready to party? Let me know what you want to rent and for what date, and I'll check our live inventory!</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="user-input" placeholder="Type here..." onkeypress="handleKeyPress(event)">
+            <button class="send-btn" id="send-btn" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // --- YOUR CLOUDFLARE URL POINTING TO THE NEW PARTY RENTAL WEBHOOK ---
+        const N8N_WEBHOOK_URL = "https://birds-withdrawal-unlike-development.trycloudflare.com/webhook/party-rental-chat"; 
+        
+        function toggleBackend() {
+            document.getElementById('backendPanel').classList.toggle('open');
+        }
+
+        function toggleChat() {
+            const chat = document.getElementById('chatContainer');
+            const toggleBtn = document.getElementById('chatToggleBtn');
+            chat.classList.toggle('open');
+            toggleBtn.classList.toggle('hidden');
+            if (chat.classList.contains('open')) {
+                document.getElementById('user-input').focus();
+            }
+        }
+
+        function openChatWithPrefill(text) {
+            const chat = document.getElementById('chatContainer');
+            const toggleBtn = document.getElementById('chatToggleBtn');
+            chat.classList.add('open');
+            toggleBtn.classList.add('hidden');
+            const input = document.getElementById('user-input');
+            input.value = text;
+            input.focus();
+        }
+
+        const sessionId = "session_" + Math.floor(Math.random() * 1000000000);
+        const chatBox = document.getElementById("chat-box");
+        const userInput = document.getElementById("user-input");
+        const sendBtn = document.getElementById("send-btn");
+
+        function appendMessage(text, sender) {
+            const msgDiv = document.createElement("div");
+            msgDiv.className = `msg ${sender}`;
+            // If the text contains a Stripe link, make it a clickable bold hyperlink
+            if(text.includes('https://buy.stripe.com')) {
+                text = text.replace(/(https:\/\/buy\.stripe\.com\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:var(--primary); font-weight:bold; text-decoration:underline;">Click Here to Pay via Stripe</a>');
+            }
+            msgDiv.innerHTML = text; 
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            appendMessage(text, "user");
+            userInput.value = "";
+            userInput.disabled = true;
+            sendBtn.disabled = true;
+            sendBtn.innerText = "...";
+
+            try {
+                const response = await fetch(N8N_WEBHOOK_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ sessionId: sessionId, message: text })
+                });
+
+                const data = await response.json();
+                
+                appendMessage(data.text || "Sorry, I encountered an error.", "bot");
+
+                // If AI deployed the Stripe link, show the green alert in the Dev Panel
+                if(data.ready_to_pay === true || data.ready_to_pay === "true") {
+                    document.getElementById("stripeAlert").style.display = "block";
+                    const panel = document.getElementById("backendPanel");
+                    if (!panel.classList.contains("open")) {
+                        panel.classList.add("open");
+                    }
+                }
+
+            } catch (error) {
+                appendMessage("System offline. Could not connect to backend.", "bot");
+            } finally {
+                userInput.disabled = false;
+                sendBtn.disabled = false;
+                sendBtn.innerText = "Send";
+                userInput.focus();
+            }
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === "Enter") sendMessage();
+        }
+    </script>
+</body>
+</html>
