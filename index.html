@@ -187,13 +187,15 @@
         const userInput = document.getElementById("user-input");
         const sendBtn = document.getElementById("send-btn");
 
-        function appendMessage(text, sender) {
+      function appendMessage(text, sender) {
             const msgDiv = document.createElement("div");
             msgDiv.className = `msg ${sender}`;
-            // If the text contains a Stripe link, make it a clickable bold hyperlink
-            if(text.includes('https://buy.stripe.com')) {
-                text = text.replace(/(https:\/\/buy\.stripe\.com\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:var(--primary); font-weight:bold; text-decoration:underline;">Click Here to Pay via Stripe</a>');
+            
+            // This new regex catches BOTH buy.stripe.com AND book.stripe.com
+            if(text.includes('stripe.com')) {
+                text = text.replace(/(https:\/\/(buy|book)\.stripe\.com\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:var(--primary); font-weight:bold; text-decoration:underline;">Click Here to Pay via Stripe &rarr;</a>');
             }
+            
             msgDiv.innerHTML = text; 
             chatBox.appendChild(msgDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
