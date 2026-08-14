@@ -187,13 +187,13 @@
         const userInput = document.getElementById("user-input");
         const sendBtn = document.getElementById("send-btn");
 
-      function appendMessage(text, sender) {
+            function appendMessage(text, sender) {
             const msgDiv = document.createElement("div");
             msgDiv.className = `msg ${sender}`;
             
-            // This new regex catches BOTH buy.stripe.com AND book.stripe.com
+            // Transform Stripe links into a sleek popup window instead of a new tab
             if(text.includes('stripe.com')) {
-                text = text.replace(/(https:\/\/(buy|book)\.stripe\.com\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:var(--primary); font-weight:bold; text-decoration:underline;">Click Here to Pay via Stripe &rarr;</a>');
+                text = text.replace(/(https:\/\/(buy|book)\.stripe\.com\/[^\s]+)/g, '<a href="#" onclick="window.open(\'$1\', \'StripeCheckout\', \'width=450,height=750,top=100,left=100,resizable=yes,scrollbars=yes\'); return false;" style="color:var(--primary); font-weight:bold; text-decoration:underline; cursor:pointer;">Click Here to Pay via Stripe &rarr;</a>');
             }
             
             msgDiv.innerHTML = text; 
