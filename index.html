@@ -184,7 +184,7 @@
                 </div>
             </div>
             <div class="card fade-in delay-2">
-                <div class="card-img" style="background-image: url('https://images.unsplash.com/photo-1563823250269-826d15a5bb1d?auto=format&fit=crop&q=80&w=600');"></div>
+               <div class="card-img" style="background-image: url('https://images.unsplash.com/photo-1550041470-349fcc0503ea?auto=format&fit=crop&q=80&w=600');"></div>
                 <div class="card-content">
                     <span class="price-tag">$250 / day</span>
                     <h3>Tropical Slide</h3>
@@ -233,12 +233,15 @@
             if (chat.classList.contains('open')) document.getElementById('user-input').focus();
         }
 
+        // Only auto-open chat if screen is larger than a phone
         setTimeout(() => {
-            const chat = document.getElementById('chatContainer');
-            const toggleBtn = document.getElementById('chatToggleBtn');
-            if (!chat.classList.contains('open')) {
-                chat.classList.add('open');
-                toggleBtn.classList.add('hidden');
+            if (window.innerWidth > 768) {
+                const chat = document.getElementById('chatContainer');
+                const toggleBtn = document.getElementById('chatToggleBtn');
+                if (!chat.classList.contains('open')) {
+                    chat.classList.add('open');
+                    toggleBtn.classList.add('hidden');
+                }
             }
         }, 2000);
 
