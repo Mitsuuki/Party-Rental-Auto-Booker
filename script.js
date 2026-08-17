@@ -3,8 +3,43 @@ const BASE_WEBHOOK_URL = "https://ships-generators-relative-wma.trycloudflare.co
 
 let isSending = false; 
 
+// --- EMAIL PING LOGIC ---
+function checkEmailInput() {
+    const emailInput = document.getElementById("demo-alert-dest");
+    const pingNav = document.getElementById("dev-ping");
+    const pingInput = document.getElementById("input-ping");
+    
+    if(emailInput.value.trim() !== "") {
+        pingNav.style.display = "none";
+        pingInput.style.display = "none";
+        emailInput.classList.add("filled");
+    } else {
+        pingNav.style.display = "inline-block";
+        pingInput.style.display = "inline-block";
+        emailInput.classList.remove("filled");
+    }
+}
+
 function toggleBackend() { 
     document.getElementById('backendPanel').classList.toggle('open'); 
+    
+    // Auto-focus the email box when they open it, if it's empty
+    const emailInput = document.getElementById("demo-alert-dest");
+    if(emailInput.value.trim() === "") {
+        setTimeout(() => emailInput.focus(), 400);
+    }
+}
+
+function refreshFrame(id) {
+    const frame = document.getElementById(id);
+    const btn = document.getElementById('btn-' + id);
+    
+    btn.classList.add('spinning');
+    setTimeout(() => btn.classList.remove('spinning'), 600);
+    
+    const currentSrc = frame.src;
+    frame.src = '';
+    setTimeout(() => { frame.src = currentSrc; }, 100);
 }
 
 function toggleChat() {
@@ -78,6 +113,11 @@ function hideTyping() {
     typingIndicator.style.display = "none"; 
 }
 
+function getTimestamp() {
+    const now = new Date();
+    return now.toLocaleTimeString('en-US', { hour12: false });
+}
+
 async function sendMessage() {
     if (isSending) return;
 
@@ -94,7 +134,15 @@ async function sendMessage() {
 
     showTyping();
 
+    const term = document.getElementById("telemetryTerminal");
+
     try {
+        const demoDest = document.getElementById("demo-alert-dest") ? document.getElementById("demo-alert-dest").value.trim() : "";
+
+        // COMMAND LINE LOGIC
+        term.innerHTML += `<br><span style="color: #64748b">[${getTimestamp()}]</span> > POST /api/v1/engine/transmit ... <span style="color:#e2e8f0">[PENDING]</span>`;
+        term.scrollTop = term.scrollHeight;
+
         const liveUrl = BASE_WEBHOOK_URL + "?t=" + Date.now();
         
         const response = await fetch(liveUrl, {
@@ -102,29 +150,58 @@ async function sendMessage() {
             headers: { 
                 "Content-Type": "application/json" 
             },
-            body: JSON.stringify({ sessionId: sessionId, message: text })
+            body: JSON.stringify({ 
+                sessionId: sessionId, 
+                message: text,
+                alert_destination: demoDest 
+            })
         });
 
         const data = await response.json();
         hideTyping();
         appendMessage(data.text || "Sorry, I encountered an error.", "bot");
 
-        // If AI deployed the Stripe link, show the green alert in the Dev Panel
+        term.innerHTML += `<br><span style="color: #64748b">[${getTimestamp()}]</span> > RESPONSE RECEIVED ... <span style="color:#10b981">[200 OK]</span>`;
+
+        // If AI deployed the Stripe link, simulate the backend process
         if(data.ready_to_pay === true || data.ready_to_pay === "true") {
-            document.getElementById("stripeAlert").style.display = "block";
-            const panel = document.getElementById("backendPanel");
-            if (!panel.classList.contains("open")) {
-                panel.classList.add("open");
-            }
+            
+            setTimeout(() => {
+                term.innerHTML += `<br><span style="color: #64748b">[${getTimestamp()}]</span> > SQL_INSERT into public.leads ... <span style="color:#10b981">[SUCCESS]</span>`;
+                term.scrollTop = term.scrollHeight;
+            }, 800);
+
+            setTimeout(() => {
+                term.innerHTML += `<br><span style="color: #64748b">[${getTimestamp()}]</span> > GENERATING STRIPE CHECKOUT SESSION ... <span style="color:#10b981">[SUCCESS]</span>`;
+                term.scrollTop = term.scrollHeight;
+            }, 1800);
+
+            setTimeout(() => {
+                if (demoDest) {
+                    term.innerHTML += `<br><span style="color: #64748b">[${getTimestamp()}]</span> > DISPATCH_MAIL_SMTP: Routing to <b>${demoDest}</b> ... <span style="color:#3b82f6">[QUEUED & SENT]</span>`;
+                    
+                    try {
+                        let ding = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+                        ding.volume = 0.5;
+                        ding.play();
+                    } catch(e) {}
+                    
+                    const panel = document.getElementById("backendPanel");
+                    if (!panel.classList.contains("open")) {
+                        panel.classList.add("open");
+                    }
+                } else {
+                    term.innerHTML += `<br><span style="color: #64748b">[${getTimestamp()}]</span> > <span style="color:#f59e0b">WARN: alert_destination is null. Skipping SMTP dispatch.</span>`;
+                }
+                term.scrollTop = term.scrollHeight;
+            }, 3000);
         }
 
     } catch (error) {
         hideTyping();
         console.error("Transmission Error:", error);
         appendMessage("Network error or outdated browser detected. Please check your connection or call us directly.", "bot");
-        
-        const errorTrace = `[DIAGNOSTIC TRACE]<br>Error: ${error.name}<br>Message: ${error.message}<br>Check n8n CORS settings or Cloudflare connection!`;
-        appendMessage(`<div style="font-size: 11px; color: #e11d48; margin-top: 8px; border-top: 1px solid rgba(225,29,72,0.2); padding-top: 8px; font-family: monospace; line-height: 1.3;">${errorTrace}</div>`, "bot");
+        term.innerHTML += `<br><span style="color: #64748b">[${getTimestamp()}]</span> > <span style="color:#ef4444">FATAL_ERR: Webhook connection timed out.</span>`;
     } finally {
         userInput.disabled = false;
         sendBtn.disabled = false;

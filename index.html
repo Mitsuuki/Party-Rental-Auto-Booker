@@ -3,41 +3,72 @@
 <head>
     <!-- 1. THE SELF-HEALING CACHE BUSTER -->
     <script>
-        const currentVersion = "2.6"; 
+        const currentVersion = "3.4"; 
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('v') !== currentVersion) {
             window.location.replace(window.location.pathname + '?v=' + currentVersion);
         }
     </script>
     
-    <!-- 2. MOBILE ZOOM FIX -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, interactive-widget=resizes-content">
     <meta charset="UTF-8">
     <title>Epic Event Rentals | Instant AI Booking</title>
     
     <!-- Link to External CSS -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=3.4">
 </head>
 <body>
 
-    <!-- Backend Dev Panel -->
+    <!-- Slide-Out Professional Dev Console -->
     <div class="backend-panel" id="backendPanel">
-        <button class="panel-close-btn" onclick="toggleBackend()">×</button>
-        <h2 style="margin-top:0; color: var(--dark);">⚙️ Inventory Control Room</h2>
-        <p style="color: #6b7280; font-size: 14px; margin-bottom: 30px;">The AI reads this live Google Calendar to prevent double-bookings, then issues Stripe links automatically.</p>
+        <h2>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                Developer Console
+            </div>
+            <button class="panel-close-btn" onclick="toggleBackend()">×</button>
+        </h2>
+        <p class="panel-subtitle">Live telemetry showing real-time event routing from the frontend UI into n8n Webhooks, Google Calendar, and CRM storage.</p>
         
-        <div class="stripe-alert" id="stripeAlert">
-            💳 STRIPE CHECKOUT INITIATED: The AI just deployed a live payment link for the customer.
+        <!-- REQUIRED EMAIL ROUTING WITH RED ALERT -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span class="panel-label" style="color: #cbd5e1; margin: 0; display: flex; align-items: center; gap: 8px;">
+                Destination Routing (Email) 
+                <span class="ping-dot" title="Action Suggested" id="input-ping"></span>
+            </span>
+        </div>
+        <div style="margin-bottom: 30px; display: flex; gap: 10px;">
+            <input type="email" id="demo-alert-dest" placeholder="[ REQUIRED: Enter target email for live lead alert ]" oninput="checkEmailInput()">
         </div>
 
-        <span class="panel-label">Live Inventory Calendar</span>
-        <div class="iframe-container">
-            <iframe src="https://calendar.google.com/calendar/embed?src=sakuramisakikawaii%40gmail.com&ctz=America%2FLos_Angeles&mode=WEEK"></iframe>
+        <!-- NEW COMMAND EMBED TERMINAL -->
+        <span class="panel-label" style="color: #cbd5e1; margin-top: 10px;">System Telemetry</span>
+        <div class="terminal-embed">
+            <div class="terminal-header">
+                <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                <span class="title">admin@epicevents-servers: ~/logs</span>
+            </div>
+            <div class="sms-terminal" id="telemetryTerminal">
+                <span style="color: #64748b">[SYS]</span> > INIT: SYSTEM ONLINE. LISTENING ON PORT 5678...<br>
+            </div>
         </div>
 
-        <span class="panel-label">Lead Database</span>
+        <!-- CALENDAR -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span class="panel-label" style="margin: 0;">Live Inventory Sync</span>
+            <button class="refresh-btn" onclick="refreshFrame('calendar-frame')" id="btn-calendar-frame" title="Force Refresh">🔄 Refresh</button>
+        </div>
         <div class="iframe-container">
-            <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ2No54tpOdLhI3xUyJf0few-si1qAvoKpib1KIuZM7AlQiJElqZCGtOXKL1PQQqC1vtlB3IyA4wdmW/pubhtml?gid=816046492&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
+            <iframe id="calendar-frame" src="https://calendar.google.com/calendar/embed?src=sakuramisakikawaii%40gmail.com&ctz=America%2FLos_Angeles"></iframe>
+        </div>
+
+        <!-- DATABASE -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span class="panel-label" style="margin: 0;">Live CRM Database</span>
+            <button class="refresh-btn" onclick="refreshFrame('sheets-frame')" id="btn-sheets-frame" title="Force Refresh">🔄 Refresh</button>
+        </div>
+        <div class="iframe-container">
+            <iframe id="sheets-frame" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ2No54tpOdLhI3xUyJf0few-si1qAvoKpib1KIuZM7AlQiJElqZCGtOXKL1PQQqC1vtlB3IyA4wdmW/pubhtml?gid=816046492&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
         </div>
     </div>
 
@@ -49,7 +80,10 @@
             </a>
             <div class="logo">Epic <span>Events</span></div>
         </div>
-        <button class="dev-btn" onclick="toggleBackend()">View Backend (Dev Mode)</button>
+        <button class="dev-btn" onclick="toggleBackend()">
+            ⚙️ View Backend (Dev Mode)
+            <span class="urgent-ping" id="dev-ping"></span>
+        </button>
     </header>
 
     <!-- Hero -->
@@ -58,7 +92,7 @@
         <p class="fade-in delay-1">Chat with our AI to check live calendar availability and book your bounce house instantly.</p>
     </section>
 
-    <!-- NEW VALUE PROPOSITION SECTION (PRIORITY 2) -->
+    <!-- Value Props -->
     <section class="features-section">
         <div class="features-grid">
             <div class="feature-card fade-in delay-1">
@@ -87,7 +121,7 @@
         </div>
         <div class="grid">
             <div class="card fade-in delay-1">
-                <div class="card-img" style="background-image: url('https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?auto=format&fit=crop&q=80&w=600');"></div>
+                <div class="card-img" style="background-image: url('https://images.unsplash.com/photo-1596484552993-9c864dd15d2a?auto=format&fit=crop&q=80&w=600');"></div>
                 <div class="card-content">
                     <span class="price-tag">$150 / day</span>
                     <h3>Classic Castle</h3>
@@ -96,7 +130,6 @@
                 </div>
             </div>
             <div class="card fade-in delay-2">
-               <!-- Swapped the broken blank image for a Water Slide -->
                <div class="card-img" style="background-image: url('https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&q=80&w=600');"></div>
                 <div class="card-content">
                     <span class="price-tag">$250 / day</span>
@@ -118,8 +151,6 @@
         </div>
         <div class="chat-box" id="chat-box">
             <div class="msg bot">Hi! Ready to party? Let me know what you want to rent and for what date, and I'll check our live inventory!</div>
-            
-            <!-- Typing Indicator -->
             <div id="typing-indicator" class="typing-indicator">
                 <span></span><span></span><span></span>
             </div>
@@ -131,7 +162,7 @@
     </div>
 
     <!-- Link to External JS -->
-    <script src="script.js"></script>
+    <script src="script.js?v=3.4"></script>
 
 </body>
 </html>
