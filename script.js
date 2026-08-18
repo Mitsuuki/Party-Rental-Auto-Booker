@@ -1,5 +1,5 @@
 // --- 100% BULLETPROOF CLOUDFLARE URL ---
-const BASE_WEBHOOK_URL = "https://ships-generators-relative-wma.trycloudflare.com/webhook/party-rental-chat";
+const BASE_WEBHOOK_URL = "https://exercises-contracting-maternity-dealers.trycloudflare.com/webhook/party-rental-chat";
 
 let isSending = false; 
 
