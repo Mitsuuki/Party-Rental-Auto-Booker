@@ -9,23 +9,24 @@ function checkEmailInput() {
     const pingNav = document.getElementById("dev-ping");
     const pingInput = document.getElementById("input-ping");
     
-    if(emailInput.value.trim() !== "") {
-        pingNav.style.display = "none";
-        pingInput.style.display = "none";
+    if(emailInput && emailInput.value.trim() !== "") {
+        if(pingNav) pingNav.style.display = "none";
+        if(pingInput) pingInput.style.display = "none";
         emailInput.classList.add("filled");
-    } else {
-        pingNav.style.display = "inline-block";
-        pingInput.style.display = "inline-block";
+    } else if(emailInput) {
+        if(pingNav) pingNav.style.display = "inline-block";
+        if(pingInput) pingInput.style.display = "inline-block";
         emailInput.classList.remove("filled");
     }
 }
 
 function toggleBackend() { 
-    document.getElementById('backendPanel').classList.toggle('open'); 
+    const panel = document.getElementById('backendPanel');
+    if(panel) panel.classList.toggle('open'); 
     
     // Auto-focus the email box when they open it, if it's empty
     const emailInput = document.getElementById("demo-alert-dest");
-    if(emailInput.value.trim() === "") {
+    if(emailInput && emailInput.value.trim() === "") {
         setTimeout(() => emailInput.focus(), 400);
     }
 }
@@ -34,21 +35,26 @@ function refreshFrame(id) {
     const frame = document.getElementById(id);
     const btn = document.getElementById('btn-' + id);
     
-    btn.classList.add('spinning');
-    setTimeout(() => btn.classList.remove('spinning'), 600);
+    if(btn) {
+        btn.classList.add('spinning');
+        setTimeout(() => btn.classList.remove('spinning'), 600);
+    }
     
-    const currentSrc = frame.src;
-    frame.src = '';
-    setTimeout(() => { frame.src = currentSrc; }, 100);
+    if(frame) {
+        const currentSrc = frame.src;
+        frame.src = '';
+        setTimeout(() => { frame.src = currentSrc; }, 100);
+    }
 }
 
 function toggleChat() {
     const chat = document.getElementById('chatContainer');
     const toggleBtn = document.getElementById('chatToggleBtn');
-    chat.classList.toggle('open');
-    toggleBtn.classList.toggle('hidden');
-    if (chat.classList.contains('open')) {
-        document.getElementById('user-input').focus();
+    if(chat) chat.classList.toggle('open');
+    if(toggleBtn) toggleBtn.classList.toggle('hidden');
+    if (chat && chat.classList.contains('open')) {
+        const userInput = document.getElementById('user-input');
+        if(userInput) userInput.focus();
     }
 }
 
@@ -57,9 +63,9 @@ setTimeout(() => {
     if (window.innerWidth > 768) {
         const chat = document.getElementById('chatContainer');
         const toggleBtn = document.getElementById('chatToggleBtn');
-        if (!chat.classList.contains('open')) {
+        if (chat && !chat.classList.contains('open')) {
             chat.classList.add('open');
-            toggleBtn.classList.add('hidden');
+            if(toggleBtn) toggleBtn.classList.add('hidden');
         }
     }
 }, 2000);
@@ -67,23 +73,25 @@ setTimeout(() => {
 function openChatWithPrefill(text) {
     const chat = document.getElementById('chatContainer');
     const toggleBtn = document.getElementById('chatToggleBtn');
-    chat.classList.add('open');
-    toggleBtn.classList.add('hidden');
+    if(chat) chat.classList.add('open');
+    if(toggleBtn) toggleBtn.classList.add('hidden');
     const input = document.getElementById('user-input');
-    input.value = text;
-    
-    input.style.height = "auto";
-    input.style.height = (input.scrollHeight) + "px";
-    
-    input.focus();
+    if(input) {
+        input.value = text;
+        input.style.height = "auto";
+        input.style.height = (input.scrollHeight) + "px";
+        input.focus();
+    }
 }
 
 // Auto-expanding textarea logic
 const userInput = document.getElementById("user-input");
-userInput.addEventListener("input", function() {
-    this.style.height = "auto";
-    this.style.height = (this.scrollHeight) + "px";
-});
+if(userInput) {
+    userInput.addEventListener("input", function() {
+        this.style.height = "auto";
+        this.style.height = (this.scrollHeight) + "px";
+    });
+}
 
 const sessionId = "session_" + Math.floor(Math.random() * 1000000000);
 const chatBox = document.getElementById("chat-box");
@@ -91,6 +99,7 @@ const sendBtn = document.getElementById("send-btn");
 const typingIndicator = document.getElementById("typing-indicator");
 
 function appendMessage(text, sender) {
+    if(!chatBox) return;
     const msgDiv = document.createElement("div");
     msgDiv.className = `msg ${sender}`;
     
@@ -100,17 +109,23 @@ function appendMessage(text, sender) {
     }
     
     msgDiv.innerHTML = text; 
-    chatBox.insertBefore(msgDiv, typingIndicator);
+    if(typingIndicator) {
+        chatBox.insertBefore(msgDiv, typingIndicator);
+    } else {
+        chatBox.appendChild(msgDiv);
+    }
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 function showTyping() { 
-    typingIndicator.style.display = "flex"; 
-    chatBox.scrollTop = chatBox.scrollHeight; 
+    if(typingIndicator && chatBox) {
+        typingIndicator.style.display = "flex"; 
+        chatBox.scrollTop = chatBox.scrollHeight; 
+    }
 }
 
 function hideTyping() { 
-    typingIndicator.style.display = "none"; 
+    if(typingIndicator) typingIndicator.style.display = "none"; 
 }
 
 function getTimestamp() {
@@ -118,32 +133,39 @@ function getTimestamp() {
     return now.toLocaleTimeString('en-US', { hour12: false });
 }
 
+function logTerminal(message) {
+    const term = document.getElementById("telemetryTerminal");
+    if (term) {
+        term.innerHTML += message;
+        term.scrollTop = term.scrollHeight;
+    }
+}
+
 async function sendMessage() {
     if (isSending) return;
 
-    const text = userInput.value.trim();
+    const text = userInput ? userInput.value.trim() : "";
     if (!text) return;
 
     isSending = true;
 
     appendMessage(text, "user");
-    userInput.value = "";
-    userInput.style.height = "auto";
-    userInput.disabled = true;
-    sendBtn.disabled = true;
+    if(userInput) {
+        userInput.value = "";
+        userInput.style.height = "auto";
+        userInput.disabled = true;
+    }
+    if(sendBtn) sendBtn.disabled = true;
 
     showTyping();
-
-    const term = document.getElementById("telemetryTerminal");
 
     try {
         const demoDest = document.getElementById("demo-alert-dest") ? document.getElementById("demo-alert-dest").value.trim() : "";
 
         // COMMAND LINE LOGIC
-        term.innerHTML += `<br><span style="color: #64748b">[${getTimestamp()}]</span> > POST /api/v1/engine/transmit ... <span style="color:#e2e8f0">[PENDING]</span>`;
-        term.scrollTop = term.scrollHeight;
+        logTerminal(`<br><span style="color: #64748b">[${getTimestamp()}]</span> > POST /api/v1/engine/transmit ... <span style="color:#e2e8f0">[PENDING]</span>`);
 
-        const liveUrl = BASE_WEBHOOK_URL + "?t=" + Date.now();
+        const liveUrl = N8N_WEBHOOK_URL + "?t=" + Date.now();
         
         const response = await fetch(liveUrl, {
             method: "POST",
@@ -157,28 +179,30 @@ async function sendMessage() {
             })
         });
 
+        if(!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
         hideTyping();
         appendMessage(data.text || "Sorry, I encountered an error.", "bot");
 
-        term.innerHTML += `<br><span style="color: #64748b">[${getTimestamp()}]</span> > RESPONSE RECEIVED ... <span style="color:#10b981">[200 OK]</span>`;
+        logTerminal(`<br><span style="color: #64748b">[${getTimestamp()}]</span> > RESPONSE RECEIVED ... <span style="color:#10b981">[200 OK]</span>`);
 
         // If AI deployed the Stripe link, simulate the backend process
         if(data.ready_to_pay === true || data.ready_to_pay === "true") {
             
             setTimeout(() => {
-                term.innerHTML += `<br><span style="color: #64748b">[${getTimestamp()}]</span> > SQL_INSERT into public.leads ... <span style="color:#10b981">[SUCCESS]</span>`;
-                term.scrollTop = term.scrollHeight;
+                logTerminal(`<br><span style="color: #64748b">[${getTimestamp()}]</span> > SQL_INSERT into public.leads ... <span style="color:#10b981">[SUCCESS]</span>`);
             }, 800);
 
             setTimeout(() => {
-                term.innerHTML += `<br><span style="color: #64748b">[${getTimestamp()}]</span> > GENERATING STRIPE CHECKOUT SESSION ... <span style="color:#10b981">[SUCCESS]</span>`;
-                term.scrollTop = term.scrollHeight;
+                logTerminal(`<br><span style="color: #64748b">[${getTimestamp()}]</span> > GENERATING STRIPE CHECKOUT SESSION ... <span style="color:#10b981">[SUCCESS]</span>`);
             }, 1800);
 
             setTimeout(() => {
                 if (demoDest) {
-                    term.innerHTML += `<br><span style="color: #64748b">[${getTimestamp()}]</span> > DISPATCH_MAIL_SMTP: Routing to <b>${demoDest}</b> ... <span style="color:#3b82f6">[QUEUED & SENT]</span>`;
+                    logTerminal(`<br><span style="color: #64748b">[${getTimestamp()}]</span> > DISPATCH_MAIL_SMTP: Routing to <b>${demoDest}</b> ... <span style="color:#3b82f6">[QUEUED & SENT]</span>`);
                     
                     try {
                         let ding = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
@@ -187,13 +211,12 @@ async function sendMessage() {
                     } catch(e) {}
                     
                     const panel = document.getElementById("backendPanel");
-                    if (!panel.classList.contains("open")) {
+                    if (panel && !panel.classList.contains("open")) {
                         panel.classList.add("open");
                     }
                 } else {
-                    term.innerHTML += `<br><span style="color: #64748b">[${getTimestamp()}]</span> > <span style="color:#f59e0b">WARN: alert_destination is null. Skipping SMTP dispatch.</span>`;
+                    logTerminal(`<br><span style="color: #64748b">[${getTimestamp()}]</span> > <span style="color:#f59e0b">WARN: alert_destination is null. Skipping SMTP dispatch.</span>`);
                 }
-                term.scrollTop = term.scrollHeight;
             }, 3000);
         }
 
@@ -201,11 +224,13 @@ async function sendMessage() {
         hideTyping();
         console.error("Transmission Error:", error);
         appendMessage("Network error or outdated browser detected. Please check your connection or call us directly.", "bot");
-        term.innerHTML += `<br><span style="color: #64748b">[${getTimestamp()}]</span> > <span style="color:#ef4444">FATAL_ERR: Webhook connection timed out.</span>`;
+        logTerminal(`<br><span style="color: #64748b">[${getTimestamp()}]</span> > <span style="color:#ef4444">FATAL_ERR: Webhook connection failed.</span>`);
     } finally {
-        userInput.disabled = false;
-        sendBtn.disabled = false;
-        userInput.focus();
+        if(userInput) {
+            userInput.disabled = false;
+            userInput.focus();
+        }
+        if(sendBtn) sendBtn.disabled = false;
         
         isSending = false; 
     }
