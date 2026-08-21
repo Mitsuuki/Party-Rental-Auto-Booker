@@ -1,5 +1,5 @@
 // --- 100% BULLETPROOF CLOUDFLARE URL ---
-const N8N_WEBHOOK_URL = 'https://problems-llp-third-neo.trycloudflare.com/webhook/party-rental-chat';
+const N8N_WEBHOOK_URL = 'https://matched-hierarchy-zealand-dui.trycloudflare.com/webhook/party-rental-chat';
 
 let isSending = false; 
 
